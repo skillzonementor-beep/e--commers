@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===== Meta Information ===== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShopEase - Your one-stop online shopping destination for electronics, fashion, and accessories.">
+    <title>ShopEase - Online Shopping Made Easy</title>
+
+    <!-- ===== CSS Stylesheet Link ===== -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- ===== Google Fonts ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ===== JavaScript (defer = runs after HTML loads) ===== -->
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <!-- ============================================
+         ANNOUNCEMENT BAR
+         A small bar at the very top with promotional text
+         ============================================ -->
+    <div class="announcement-bar" id="announcementBar">
+        <div class="container">
+            <p>🎉 Free shipping on orders over $50! Use code: <strong>SHOPEASE</strong></p>
+        </div>
+    </div>
+
+    <!-- ============================================
+         HEADER & NAVIGATION
+         Contains logo, search bar, navigation links, and cart button
+         ============================================ -->
+    <header class="header" id="header">
+        <div class="container header-container">
+
+            <!-- Logo -->
+            <a href="#home" class="logo" id="logo">
+                <span class="logo-icon">🛍️</span>
+                <span class="logo-text">Shop<span class="logo-accent">Ease</span></span>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="search-bar" id="searchBar">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search products..."
+                    aria-label="Search products"
+                >
+                <button id="searchButton" class="search-btn" aria-label="Search">
+                    🔍
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav" id="nav">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#products" class="nav-link">Products</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+
+            <!-- Cart Button -->
+            <button class="cart-button" id="cartButton" aria-label="Open shopping cart">
+                <span class="cart-icon">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+
+            <!-- Mobile Menu Button (visible only on small screens) -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation (hidden by default) -->
+        <div class="mobile-nav" id="mobileNav">
+            <a href="#home" class="mobile-nav-link">Home</a>
+            <a href="#products" class="mobile-nav-link">Products</a>
+            <a href="#about" class="mobile-nav-link">About</a>
+            <a href="#contact" class="mobile-nav-link">Contact</a>
+        </div>
+    </header>
+
+    <!-- ============================================
+         MAIN CONTENT AREA
+         ============================================ -->
+    <main>
+
+        <!-- ===== HERO SECTION ===== -->
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <!-- Hero Text -->
+                <div class="hero-text">
+                    <span class="hero-badge">✨ New Collection 2026</span>
+                    <h1 class="hero-title">
+                        Discover Amazing
+                        <span class="highlight">Products</span>
+                    </h1>
+                    <p class="hero-description">
+                        Shop the latest trends in electronics, fashion, and accessories.
+                        Quality products at unbeatable prices, delivered to your door.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#products" class="btn btn-primary btn-lg">
+                            Shop Now <span class="btn-arrow">→</span>
+                        </a>
+                        <a href="#about" class="btn btn-outline btn-lg">
+                            Learn More
+                        </a>
+                    </div>
+                    <!-- Stats -->
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number">10K+</span>
+                            <span class="stat-label">Happy Customers</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Products</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">99%</span>
+                            <span class="stat-label">Satisfaction</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Visual (decorative floating elements) -->
+                <div class="hero-visual">
+                    <div class="hero-card hero-card-1">
+                        <span class="hero-card-emoji">🎧</span>
+                        <span class="hero-card-text">Headphones</span>
+                        <span class="hero-card-price">$79.99</span>
+                    </div>
+                    <div class="hero-card hero-card-2">
+                        <span class="hero-card-emoji">⌚</span>
+                        <span class="hero-card-text">Smart Watch</span>
+                        <span class="hero-card-price">$199.99</span>
+                    </div>
+                    <div class="hero-card hero-card-3">
+                        <span class="hero-card-emoji">👟</span>
+                        <span class="hero-card-text">Sneakers</span>
+                        <span class="hero-card-price">$89.99</span>
+                    </div>
+                    <div class="floating-shape shape-1"></div>
+                    <div class="floating-shape shape-2"></div>
+                    <div class="floating-shape shape-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FEATURED PRODUCTS SECTION ===== -->
+        <section class="products-section" id="products">
+            <div class="container">
+                <!-- Section Header -->
+                <div class="section-header">
+                    <span class="section-badge">🔥 Trending</span>
+                    <h2 class="section-title">Featured Products</h2>
+                    <p class="section-subtitle">
+                        Discover our handpicked collection of premium products
+                    </p>
+                </div>
+
+                <!-- Category Filter Buttons -->
+                <div class="category-filters" id="categoryFilters">
+                    <button class="filter-btn active" data-category="all">
+                        All Products
+                    </button>
+                    <button class="filter-btn" data-category="electronics">
+                        ⚡ Electronics
+                    </button>
+                    <button class="filter-btn" data-category="fashion">
+                        👗 Fashion
+                    </button>
+                    <button class="filter-btn" data-category="accessories">
+                        💎 Accessories
+                    </button>
+                </div>
+
+                <!-- Product Grid (products inserted by JavaScript) -->
+                <div class="product-grid" id="productGrid">
+                    <!-- JavaScript will insert product cards here -->
+                </div>
+
+                <!-- No Results Message (hidden by default) -->
+                <div class="no-results" id="noResults">
+                    <span class="no-results-icon">😕</span>
+                    <h3>No products found</h3>
+                    <p>Try a different search term or category.</p>
+                    <button class="btn btn-outline" id="clearFiltersBtn">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ABOUT SECTION ===== -->
+        <section class="about-section" id="about">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">💡 About Us</span>
+                    <h2 class="section-title">Why Choose ShopEase?</h2>
+                    <p class="section-subtitle">
+                        We bring you the best shopping experience
+                    </p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🚚</span>
+                        <h3>Free Shipping</h3>
+                        <p>Free delivery on all orders over $50. Fast and reliable shipping worldwide.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔒</span>
+                        <h3>Secure Payment</h3>
+                        <p>Your payment information is always safe with our encrypted checkout system.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔄</span>
+                        <h3>Easy Returns</h3>
+                        <p>Not satisfied? Return within 30 days for a full refund. No questions asked.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">💬</span>
+                        <h3>24/7 Support</h3>
+                        <p>Our customer support team is always here to help you, anytime you need.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================
+         CART SIDEBAR
+         Slides in from the right when the cart button is clicked
+         ============================================ -->
+
+    <!-- Dark overlay behind the cart -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Cart Panel -->
+    <aside class="cart-sidebar" id="cartSidebar" aria-label="Shopping cart">
+        <!-- Cart Header -->
+        <div class="cart-header">
+            <h2>🛒 Your Cart</h2>
+            <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">
+                ✕
+            </button>
+        </div>
+
+        <!-- Cart Items (inserted by JavaScript) -->
+        <div class="cart-items" id="cartItems">
+            <!-- JavaScript will insert cart item cards here -->
+        </div>
+
+        <!-- Cart Footer with totals and checkout -->
+        <div class="cart-footer" id="cartFooter">
+            <div class="cart-totals">
+                <div class="cart-row">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="cart-row">
+                    <span>Shipping</span>
+                    <span class="shipping-text" id="shippingText">Free</span>
+                </div>
+                <div class="cart-row cart-row-total">
+                    <span>Total</span>
+                    <span id="cartTotal">$0.00</span>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-checkout" id="checkoutBtn">
+                🔒 Checkout (Demo)
+            </button>
+            <p class="checkout-note">
+                This is a demo. No real payment will be processed.
+            </p>
+        </div>
+    </aside>
+
+    <!-- ============================================
+         CHECKOUT SUCCESS MODAL
+         Appears after a successful demo checkout
+         ============================================ -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal" id="modalContent">
+            <div class="modal-icon">✅</div>
+            <h2 class="modal-title">Order Confirmed!</h2>
+            <p class="modal-message">
+                Thank you for your order! This is a <strong>demo checkout</strong> — 
+                no real payment has been processed.
+            </p>
+            <p class="modal-total" id="modalTotal">Total: $0.00</p>
+            <button class="btn btn-primary" id="modalCloseBtn">
+                Continue Shopping
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================
+         FOOTER
+         Contains navigation, contact info, and copyright
+         ============================================ -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Footer: About -->
+                <div class="footer-section">
+                    <h3 class="footer-logo">
+                        🛍️ Shop<span class="logo-accent">Ease</span>
+                    </h3>
+                    <p class="footer-about">
+                        Your one-stop destination for quality products at amazing prices.
+                        Shop with confidence and enjoy a seamless experience.
+                    </p>
+                </div>
+
+                <!-- Footer: Quick Links -->
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Footer: Categories -->
+                <div class="footer-section">
+                    <h3>Categories</h3>
+                    <ul class="footer-links">
+                        <li><a href="#products">Electronics</a></li>
+                        <li><a href="#products">Fashion</a></li>
+                        <li><a href="#products">Accessories</a></li>
+                        <li><a href="#products">New Arrivals</a></li>
+                    </ul>
+                </div>
+
+                <!-- Footer: Contact -->
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-contact">
+                        <li>📧 hello@shopease.com</li>
+                        <li>📞 +1 (555) 123-4567</li>
+                        <li>📍 123 Shopping Street, NY</li>
+                        <li>🕐 Mon-Fri: 9AM - 6PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p>
+                    &copy; 2026 ShopEase. All rights reserved. | 
+                    Built for learning purposes 📚
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== Toast Notification (shown briefly after actions) ===== -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span class="toast-message" id="toastMessage">Item added to cart!</span>
+    </div>
+
+</body>
+</html>
