@@ -1,89 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <!-- ===== Meta Information ===== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ShopEase - Your one-stop online shopping destination for electronics, fashion, and accessories.">
-    <title>ShopEase - Online Shopping Made Easy</title>
+    <meta name="description" content="NexCommerce - Premium Online Store with cutting-edge electronics, fashion, and luxury accessories. Enjoy fast worldwide shipping, secure checkout, and exclusive discounts.">
+    <meta name="keywords" content="ecommerce, online shopping, electronics, fashion, accessories, premium store, best deals">
+    <meta name="theme-color" content="#4f46e5">
+    <title>NexCommerce | Flagship E-Commerce Experience</title>
 
-    <!-- ===== CSS Stylesheet Link ===== -->
-    <link rel="stylesheet" href="style.css">
+    <!-- ===== Favicon ===== -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
 
     <!-- ===== Google Fonts ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- ===== JavaScript (defer = runs after HTML loads) ===== -->
+    <!-- ===== Stylesheet ===== -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- ===== JavaScript (Deferred) ===== -->
     <script src="script.js" defer></script>
 </head>
 <body>
 
     <!-- ============================================
-         ANNOUNCEMENT BAR
-         A small bar at the very top with promotional text
+         ANNOUNCEMENT PROMO TICKER
          ============================================ -->
     <div class="announcement-bar" id="announcementBar">
-        <div class="container">
-            <p>🎉 Free shipping on orders over $50! Use code: <strong>SHOPEASE</strong></p>
+        <div class="container announcement-container">
+            <div class="announcement-ticker" id="announcementTicker">
+                <span class="ticker-item active">⚡ FLASH SALE: Extra 20% OFF with code <strong class="promo-code-badge" data-code="WELCOME20">WELCOME20</strong> (Click to copy)</span>
+                <span class="ticker-item">🚚 FREE express shipping worldwide on all orders over $50!</span>
+                <span class="ticker-item">⭐ Over 25,000+ satisfied customers • 30-day money-back guarantee</span>
+            </div>
+            <button class="announcement-close" id="closeAnnouncement" aria-label="Dismiss banner">✕</button>
         </div>
     </div>
 
     <!-- ============================================
          HEADER & NAVIGATION
-         Contains logo, search bar, navigation links, and cart button
          ============================================ -->
     <header class="header" id="header">
         <div class="container header-container">
 
-            <!-- Logo -->
+            <!-- Brand Logo -->
             <a href="#home" class="logo" id="logo">
-                <span class="logo-icon">🛍️</span>
-                <span class="logo-text">Shop<span class="logo-accent">Ease</span></span>
+                <div class="logo-mark">
+                    <span class="logo-icon">✨</span>
+                </div>
+                <div class="logo-text-group">
+                    <span class="logo-title">Nex<span class="logo-accent">Commerce</span></span>
+                    <span class="logo-subtitle">LUXE ESSENTIALS</span>
+                </div>
             </a>
 
-            <!-- Search Bar -->
-            <div class="search-bar" id="searchBar">
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Search products..."
-                    aria-label="Search products"
-                >
-                <button id="searchButton" class="search-btn" aria-label="Search">
-                    🔍
-                </button>
+            <!-- Live Search Bar with Instant Autocomplete Dropdown -->
+            <div class="search-wrapper" id="searchWrapper">
+                <div class="search-bar" id="searchBar">
+                    <span class="search-icon">🔍</span>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search headphones, shoes, watch..."
+                        aria-label="Search products"
+                        autocomplete="off"
+                    >
+                    <button class="search-clear-btn" id="searchClearBtn" aria-label="Clear search" style="display: none;">✕</button>
+                    <span class="search-kbd-shortcut" title="Press Ctrl+K or / to search">Ctrl K</span>
+                </div>
+                <!-- Autocomplete Dropdown -->
+                <div class="search-autocomplete-dropdown" id="searchAutocomplete"></div>
             </div>
 
-            <!-- Navigation Links -->
+            <!-- Desktop Navigation -->
             <nav class="nav" id="nav">
                 <a href="#home" class="nav-link active">Home</a>
-                <a href="#products" class="nav-link">Products</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#contact" class="nav-link">Contact</a>
+                <a href="#products" class="nav-link">Catalog</a>
+                <a href="#deals" class="nav-link">Flash Deals</a>
+                <a href="#reviews" class="nav-link">Reviews</a>
             </nav>
 
-            <!-- Cart Button -->
-            <button class="cart-button" id="cartButton" aria-label="Open shopping cart">
-                <span class="cart-icon">🛒</span>
-                <span class="cart-count" id="cartCount">0</span>
-            </button>
+            <!-- Actions Group (Theme, Wishlist, Cart) -->
+            <div class="header-actions">
+                <!-- Theme Mode Toggle -->
+                <button class="action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle dark/light mode" title="Toggle Theme">
+                    <span class="theme-icon sun-icon">☀️</span>
+                    <span class="theme-icon moon-icon">🌙</span>
+                </button>
 
-            <!-- Mobile Menu Button (visible only on small screens) -->
-            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
+                <!-- Wishlist Button -->
+                <button class="action-btn wishlist-btn" id="wishlistBtn" aria-label="View Wishlist" title="Your Wishlist">
+                    <span class="action-icon">🤍</span>
+                    <span class="badge-count wishlist-count" id="wishlistCount">0</span>
+                </button>
+
+                <!-- Cart Button -->
+                <button class="action-btn cart-button" id="cartButton" aria-label="Open Cart" title="Your Cart">
+                    <span class="action-icon">🛍️</span>
+                    <span class="badge-count cart-count" id="cartCount">0</span>
+                    <span class="header-cart-total" id="headerCartTotal">$0.00</span>
+                </button>
+
+                <!-- Mobile Menu Hamburger -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open mobile menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
         </div>
 
-        <!-- Mobile Navigation (hidden by default) -->
+        <!-- Mobile Drawer Navigation -->
         <div class="mobile-nav" id="mobileNav">
-            <a href="#home" class="mobile-nav-link">Home</a>
-            <a href="#products" class="mobile-nav-link">Products</a>
-            <a href="#about" class="mobile-nav-link">About</a>
-            <a href="#contact" class="mobile-nav-link">Contact</a>
+            <div class="mobile-nav-inner">
+                <div class="mobile-nav-links">
+                    <a href="#home" class="mobile-nav-link active">🏠 Home</a>
+                    <a href="#products" class="mobile-nav-link">📦 Products Catalog</a>
+                    <a href="#deals" class="mobile-nav-link">⚡ Flash Deals</a>
+                    <a href="#reviews" class="mobile-nav-link">⭐ Customer Reviews</a>
+                </div>
+                <div class="mobile-nav-footer">
+                    <div class="mobile-theme-row">
+                        <span>Appearance Mode</span>
+                        <button class="btn btn-outline btn-sm" id="mobileThemeBtn">🌙 Dark Mode</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -93,144 +137,340 @@
     <main>
 
         <!-- ===== HERO SECTION ===== -->
-        <section class="hero" id="home">
-            <div class="container hero-content">
-                <!-- Hero Text -->
-                <div class="hero-text">
-                    <span class="hero-badge">✨ New Collection 2026</span>
+        <section class="hero-section" id="home">
+            <div class="hero-mesh-background">
+                <div class="mesh-blob blob-1"></div>
+                <div class="mesh-blob blob-2"></div>
+                <div class="mesh-blob blob-3"></div>
+            </div>
+
+            <div class="container hero-container">
+                <!-- Hero Left: Content -->
+                <div class="hero-content">
+                    <div class="hero-badge-pill">
+                        <span class="badge-glow"></span>
+                        <span class="badge-emoji">🚀</span>
+                        <span class="badge-text">2026 FLAGSHIP COLLECTION • LIMITED DROP</span>
+                    </div>
+
                     <h1 class="hero-title">
-                        Discover Amazing
-                        <span class="highlight">Products</span>
+                        Engineered for <span class="gradient-text">Perfection.</span><br>
+                        Curated for You.
                     </h1>
+
                     <p class="hero-description">
-                        Shop the latest trends in electronics, fashion, and accessories.
-                        Quality products at unbeatable prices, delivered to your door.
+                        Explore precision-crafted electronics, contemporary fashion, and refined accessories.
+                        Experience next-generation design with instant worldwide dispatch and guaranteed authenticity.
                     </p>
-                    <div class="hero-buttons">
-                        <a href="#products" class="btn btn-primary btn-lg">
-                            Shop Now <span class="btn-arrow">→</span>
+
+                    <div class="hero-actions">
+                        <a href="#products" class="btn btn-primary btn-xl glow-effect">
+                            <span>Explore Catalog</span>
+                            <span class="btn-arrow">→</span>
                         </a>
-                        <a href="#about" class="btn btn-outline btn-lg">
-                            Learn More
+                        <a href="#deals" class="btn btn-glass btn-xl">
+                            <span>⚡ Flash Offers</span>
                         </a>
                     </div>
-                    <!-- Stats -->
-                    <div class="hero-stats">
-                        <div class="stat">
-                            <span class="stat-number">10K+</span>
-                            <span class="stat-label">Happy Customers</span>
+
+                    <!-- Trust Stats & Badges -->
+                    <div class="hero-stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number">25K+</span>
+                            <span class="stat-label">Orders Delivered</span>
                         </div>
-                        <div class="stat">
-                            <span class="stat-number">500+</span>
-                            <span class="stat-label">Products</span>
+                        <div class="stat-card">
+                            <span class="stat-number">4.9/5</span>
+                            <span class="stat-label">Verified Ratings</span>
                         </div>
-                        <div class="stat">
-                            <span class="stat-number">99%</span>
-                            <span class="stat-label">Satisfaction</span>
+                        <div class="stat-card">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Authentic Gear</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Hero Visual (decorative floating elements) -->
-                <div class="hero-visual">
-                    <div class="hero-card hero-card-1">
-                        <span class="hero-card-emoji">🎧</span>
-                        <span class="hero-card-text">Headphones</span>
-                        <span class="hero-card-price">$79.99</span>
+                <!-- Hero Right: Interactive 3D Showcase Card -->
+                <div class="hero-showcase">
+                    <div class="showcase-card" id="heroShowcaseCard">
+                        <div class="showcase-tag">🔥 STAFF PICK OF THE WEEK</div>
+                        <div class="showcase-image-box">
+                            <img
+                                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80"
+                                alt="Sony WH-1000XM5 Studio Edition"
+                                class="showcase-img"
+                                id="heroShowcaseImg"
+                            >
+                            <span class="showcase-discount-badge">-25% OFF</span>
+                        </div>
+                        <div class="showcase-info">
+                            <div class="showcase-meta">
+                                <span class="showcase-category">ELECTRONICS</span>
+                                <div class="showcase-rating">★★★★★ <span>4.9 (428)</span></div>
+                            </div>
+                            <h2 class="showcase-title">WH-1000XM5 Spatial Noise Canceller</h2>
+                            <p class="showcase-desc">Industry-leading acoustics, 30h battery life, spatial immersive audio.</p>
+                            <div class="showcase-bottom">
+                                <div class="showcase-pricing">
+                                    <span class="current-price">$349.99</span>
+                                    <span class="original-price">$399.99</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm showcase-add-btn" data-hero-product-id="1">
+                                    🛍️ Quick Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Floating Micro Pill 1 -->
+                        <div class="floating-pill pill-top-left">
+                            <span class="pill-icon">✨</span>
+                            <div class="pill-text">
+                                <strong>Lossless Hi-Res</strong>
+                                <span>30hr Battery</span>
+                            </div>
+                        </div>
+
+                        <!-- Floating Micro Pill 2 -->
+                        <div class="floating-pill pill-bottom-right">
+                            <span class="pill-icon">🚚</span>
+                            <div class="pill-text">
+                                <strong>Free Express Delivery</strong>
+                                <span>Ships in 24h</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="hero-card hero-card-2">
-                        <span class="hero-card-emoji">⌚</span>
-                        <span class="hero-card-text">Smart Watch</span>
-                        <span class="hero-card-price">$199.99</span>
-                    </div>
-                    <div class="hero-card hero-card-3">
-                        <span class="hero-card-emoji">👟</span>
-                        <span class="hero-card-text">Sneakers</span>
-                        <span class="hero-card-price">$89.99</span>
-                    </div>
-                    <div class="floating-shape shape-1"></div>
-                    <div class="floating-shape shape-2"></div>
-                    <div class="floating-shape shape-3"></div>
                 </div>
             </div>
         </section>
 
-        <!-- ===== FEATURED PRODUCTS SECTION ===== -->
+        <!-- ===== TRUST VALUE PROPOSITION STRIP ===== -->
+        <section class="trust-strip">
+            <div class="container trust-container">
+                <div class="trust-item">
+                    <div class="trust-icon-box">🚚</div>
+                    <div class="trust-text">
+                        <h4>Free Global Shipping</h4>
+                        <p>On all qualifying orders over $50</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon-box">🛡️</div>
+                    <div class="trust-text">
+                        <h4>30-Day Money-Back</h4>
+                        <p>No-hassle returns and exchanges</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon-box">🔒</div>
+                    <div class="trust-text">
+                        <h4>256-Bit SSL Checkout</h4>
+                        <p>Bank-grade encrypted payments</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon-box">💬</div>
+                    <div class="trust-text">
+                        <h4>24/7 VIP Customer Care</h4>
+                        <p>Live chat & instant assistance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FLASH DEALS BANNER ===== -->
+        <section class="deals-section" id="deals">
+            <div class="container">
+                <div class="deals-banner">
+                    <div class="deals-content">
+                        <span class="deals-tag">⚡ LIMITED TIME OFFER</span>
+                        <h2 class="deals-title">Supercharge Your Savings Today</h2>
+                        <p class="deals-subtitle">Use promo code below at checkout to enjoy up to 20% off all flagship gear.</p>
+                        <div class="promo-clipboard" id="promoClipboard" title="Click to copy coupon code">
+                            <span class="promo-label">COUPON CODE:</span>
+                            <span class="promo-code">WELCOME20</span>
+                            <button class="promo-copy-btn" id="promoCopyBtn">📋 Copy Code</button>
+                        </div>
+                    </div>
+                    <div class="deals-timer-box">
+                        <span class="timer-title">Deal Expires In:</span>
+                        <div class="countdown-timer" id="countdownTimer">
+                            <div class="timer-unit"><span class="unit-val" id="timerHours">08</span><span class="unit-label">Hours</span></div>
+                            <span class="timer-sep">:</span>
+                            <div class="timer-unit"><span class="unit-val" id="timerMinutes">45</span><span class="unit-label">Mins</span></div>
+                            <span class="timer-sep">:</span>
+                            <div class="timer-unit"><span class="unit-val" id="timerSeconds">30</span><span class="unit-label">Secs</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PRODUCT CATALOG SECTION ===== -->
         <section class="products-section" id="products">
             <div class="container">
                 <!-- Section Header -->
-                <div class="section-header">
-                    <span class="section-badge">🔥 Trending</span>
-                    <h2 class="section-title">Featured Products</h2>
-                    <p class="section-subtitle">
-                        Discover our handpicked collection of premium products
-                    </p>
+                <div class="section-header-row">
+                    <div class="section-title-group">
+                        <span class="section-badge">✨ CURATED COLLECTION</span>
+                        <h2 class="section-title">Explore Our Flagship Products</h2>
+                        <p class="section-subtitle">Precision engineered gadgets, modern streetwear, and timeless luxury items.</p>
+                    </div>
+                    <div class="catalog-summary">
+                        <span id="catalogCount">Showing 12 items</span>
+                    </div>
                 </div>
 
-                <!-- Category Filter Buttons -->
-                <div class="category-filters" id="categoryFilters">
-                    <button class="filter-btn active" data-category="all">
-                        All Products
-                    </button>
-                    <button class="filter-btn" data-category="electronics">
-                        ⚡ Electronics
-                    </button>
-                    <button class="filter-btn" data-category="fashion">
-                        👗 Fashion
-                    </button>
-                    <button class="filter-btn" data-category="accessories">
-                        💎 Accessories
-                    </button>
+                <!-- Interactive Filter & Controls Bar -->
+                <div class="catalog-controls-card">
+                    <!-- Category Filter Buttons -->
+                    <div class="category-filters" id="categoryFilters">
+                        <button class="filter-pill active" data-category="all">
+                            <span>✨ All Products</span>
+                            <span class="filter-count" id="countAll">12</span>
+                        </button>
+                        <button class="filter-pill" data-category="electronics">
+                            <span>⚡ Electronics</span>
+                            <span class="filter-count" id="countElectronics">4</span>
+                        </button>
+                        <button class="filter-pill" data-category="fashion">
+                            <span>👗 Fashion</span>
+                            <span class="filter-count" id="countFashion">4</span>
+                        </button>
+                        <button class="filter-pill" data-category="accessories">
+                            <span>💎 Accessories</span>
+                            <span class="filter-count" id="countAccessories">4</span>
+                        </button>
+                    </div>
+
+                    <!-- Filter Sub-Controls (Price Slider, Sort, In-Stock, View Mode) -->
+                    <div class="controls-toolbar">
+                        <!-- Price Range Slider -->
+                        <div class="control-group price-control-group">
+                            <div class="price-slider-header">
+                                <label for="priceRange">Max Price:</label>
+                                <span class="price-val" id="priceRangeValue">$400</span>
+                            </div>
+                            <input type="range" id="priceRange" min="20" max="400" step="10" value="400" class="styled-range">
+                        </div>
+
+                        <!-- Sorting Dropdown -->
+                        <div class="control-group sort-control-group">
+                            <label for="sortSelect">Sort By:</label>
+                            <div class="select-wrapper">
+                                <select id="sortSelect" class="styled-select">
+                                    <option value="featured">🌟 Featured & Popular</option>
+                                    <option value="price-low">💰 Price: Low to High</option>
+                                    <option value="price-high">💎 Price: High to Low</option>
+                                    <option value="rating">⭐ Customer Rating</option>
+                                    <option value="discount">🔥 Top Discounts</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- In Stock Only Checkbox -->
+                        <label class="stock-checkbox-label">
+                            <input type="checkbox" id="inStockCheckbox">
+                            <span class="checkbox-custom"></span>
+                            <span>In Stock Only</span>
+                        </label>
+
+                        <!-- Layout Switcher (Grid vs List) -->
+                        <div class="layout-switcher">
+                            <button class="layout-btn active" id="layoutGridBtn" aria-label="Grid View" title="Grid View">
+                                ⊞
+                            </button>
+                            <button class="layout-btn" id="layoutListBtn" aria-label="List View" title="List View">
+                                ☰
+                            </button>
+                        </div>
+
+                        <!-- Reset Filters Button -->
+                        <button class="btn btn-outline btn-sm reset-filters-btn" id="resetFiltersBtn">
+                            🔄 Reset
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Product Grid (products inserted by JavaScript) -->
+                <!-- Product Grid Container -->
                 <div class="product-grid" id="productGrid">
-                    <!-- JavaScript will insert product cards here -->
+                    <!-- Populated dynamically via JavaScript -->
                 </div>
 
-                <!-- No Results Message (hidden by default) -->
-                <div class="no-results" id="noResults">
-                    <span class="no-results-icon">😕</span>
-                    <h3>No products found</h3>
-                    <p>Try a different search term or category.</p>
-                    <button class="btn btn-outline" id="clearFiltersBtn">
-                        Clear Filters
-                    </button>
+                <!-- No Results Empty State -->
+                <div class="no-results" id="noResults" style="display: none;">
+                    <div class="no-results-icon">🔍</div>
+                    <h3 class="no-results-title">No matching products found</h3>
+                    <p class="no-results-desc">We couldn't find anything matching your filters or search keywords.</p>
+                    <button class="btn btn-primary" id="clearFiltersBtn">Clear All Filters</button>
                 </div>
             </div>
         </section>
 
-        <!-- ===== ABOUT SECTION ===== -->
-        <section class="about-section" id="about">
+        <!-- ===== TESTIMONIALS / REVIEWS SECTION ===== -->
+        <section class="reviews-section" id="reviews">
             <div class="container">
-                <div class="section-header">
-                    <span class="section-badge">💡 About Us</span>
-                    <h2 class="section-title">Why Choose ShopEase?</h2>
-                    <p class="section-subtitle">
-                        We bring you the best shopping experience
-                    </p>
+                <div class="section-header text-center">
+                    <span class="section-badge">⭐ SOCIAL PROOF</span>
+                    <h2 class="section-title">Loved by Thousands Worldwide</h2>
+                    <p class="section-subtitle">Real experiences from verified buyers who upgraded their everyday gear.</p>
                 </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <span class="feature-icon">🚚</span>
-                        <h3>Free Shipping</h3>
-                        <p>Free delivery on all orders over $50. Fast and reliable shipping worldwide.</p>
+
+                <div class="reviews-grid">
+                    <div class="review-card">
+                        <div class="review-stars">★★★★★</div>
+                        <p class="review-comment">"The Sony XM5 headphones arrived in 2 days. The noise cancellation is pure magic during flights, and the packaging was immaculate!"</p>
+                        <div class="review-author">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Sarah J." class="author-avatar">
+                            <div>
+                                <strong>Sarah Jenkins</strong>
+                                <span class="author-role">Verified Buyer • New York</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">🔒</span>
-                        <h3>Secure Payment</h3>
-                        <p>Your payment information is always safe with our encrypted checkout system.</p>
+
+                    <div class="review-card">
+                        <div class="review-stars">★★★★★</div>
+                        <p class="review-comment">"The checkout was silky smooth and applying the WELCOME20 coupon saved me $40 instantly. Truly one of the best online buying experiences."</p>
+                        <div class="review-author">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Marcus T." class="author-avatar">
+                            <div>
+                                <strong>Marcus Thorne</strong>
+                                <span class="author-role">Verified Buyer • London</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">🔄</span>
-                        <h3>Easy Returns</h3>
-                        <p>Not satisfied? Return within 30 days for a full refund. No questions asked.</p>
+
+                    <div class="review-card">
+                        <div class="review-stars">★★★★★</div>
+                        <p class="review-comment">"Craftsmanship on the Italian leather wallet and roll-top backpack is next level. Premium materials that actually live up to the photography."</p>
+                        <div class="review-author">
+                            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Elena R." class="author-avatar">
+                            <div>
+                                <strong>Elena Rostova</strong>
+                                <span class="author-role">Verified Buyer • Berlin</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">💬</span>
-                        <h3>24/7 Support</h3>
-                        <p>Our customer support team is always here to help you, anytime you need.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VIP NEWSLETTER SECTION ===== -->
+        <section class="newsletter-section">
+            <div class="container">
+                <div class="newsletter-card">
+                    <div class="newsletter-text">
+                        <span class="newsletter-tag">💎 EXCLUSIVE PRIVILEGES</span>
+                        <h2 class="newsletter-title">Join the NexCommerce VIP Club</h2>
+                        <p class="newsletter-subtitle">Subscribe for insider secret sales, private drops, and instant 15% off coupon.</p>
                     </div>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <div class="newsletter-input-group">
+                            <input type="email" id="newsletterEmail" placeholder="Enter your best email address..." required>
+                            <button type="submit" class="btn btn-primary">Claim 15% Off</button>
+                        </div>
+                        <span class="newsletter-privacy">🔒 No spam, ever. Unsubscribe with 1-click anytime.</span>
+                    </form>
                 </div>
             </div>
         </section>
@@ -238,139 +478,370 @@
     </main>
 
     <!-- ============================================
-         CART SIDEBAR
-         Slides in from the right when the cart button is clicked
+         CART SIDEBAR DRAWER
          ============================================ -->
-
-    <!-- Dark overlay behind the cart -->
-    <div class="cart-overlay" id="cartOverlay"></div>
-
-    <!-- Cart Panel -->
-    <aside class="cart-sidebar" id="cartSidebar" aria-label="Shopping cart">
-        <!-- Cart Header -->
-        <div class="cart-header">
-            <h2>🛒 Your Cart</h2>
-            <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">
-                ✕
-            </button>
+    <div class="drawer-overlay" id="cartOverlay"></div>
+    <aside class="drawer cart-drawer" id="cartSidebar" aria-label="Shopping Cart">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+            <div class="drawer-title-box">
+                <span class="drawer-icon">🛍️</span>
+                <h3>Your Bag (<span id="cartDrawerCount">0</span>)</h3>
+            </div>
+            <button class="drawer-close-btn" id="cartCloseBtn" aria-label="Close cart">✕</button>
         </div>
 
-        <!-- Cart Items (inserted by JavaScript) -->
-        <div class="cart-items" id="cartItems">
-            <!-- JavaScript will insert cart item cards here -->
+        <!-- Free Shipping Progress Bar -->
+        <div class="shipping-progress-container" id="shippingProgressContainer">
+            <div class="shipping-progress-label">
+                <span id="shippingProgressText">Add <strong>$50.00</strong> more to unlock <strong>FREE Shipping</strong>!</span>
+            </div>
+            <div class="shipping-progress-track">
+                <div class="shipping-progress-fill" id="shippingProgressFill" style="width: 0%;"></div>
+            </div>
         </div>
 
-        <!-- Cart Footer with totals and checkout -->
+        <!-- Cart Items Scroll Area -->
+        <div class="cart-items-container" id="cartItems">
+            <!-- Rendered by JavaScript -->
+        </div>
+
+        <!-- Cart Footer & Summary -->
         <div class="cart-footer" id="cartFooter">
-            <div class="cart-totals">
-                <div class="cart-row">
+            <!-- Promo Code Engine -->
+            <div class="promo-box">
+                <div class="promo-input-row">
+                    <input type="text" id="promoInput" placeholder="Promo code (e.g. WELCOME20)" autocomplete="off">
+                    <button class="btn btn-outline btn-sm" id="applyPromoBtn">Apply</button>
+                </div>
+                <div class="promo-feedback" id="promoFeedback"></div>
+            </div>
+
+            <!-- Breakdown -->
+            <div class="cart-totals-breakdown">
+                <div class="breakdown-row">
                     <span>Subtotal</span>
                     <span id="cartSubtotal">$0.00</span>
                 </div>
-                <div class="cart-row">
-                    <span>Shipping</span>
-                    <span class="shipping-text" id="shippingText">Free</span>
+                <div class="breakdown-row discount-row" id="discountRow" style="display: none;">
+                    <span>Promo Discount (<span id="discountCodeName"></span>)</span>
+                    <span id="cartDiscount" class="text-success">-$0.00</span>
                 </div>
-                <div class="cart-row cart-row-total">
-                    <span>Total</span>
-                    <span id="cartTotal">$0.00</span>
+                <div class="breakdown-row">
+                    <span>Estimated Tax (8%)</span>
+                    <span id="cartTax">$0.00</span>
+                </div>
+                <div class="breakdown-row">
+                    <span>Shipping</span>
+                    <span id="shippingText">Free</span>
+                </div>
+                <div class="breakdown-row total-row">
+                    <span>Total Due</span>
+                    <span id="cartTotal" class="total-amount">$0.00</span>
                 </div>
             </div>
+
+            <!-- Actions -->
             <button class="btn btn-primary btn-checkout" id="checkoutBtn">
-                🔒 Checkout (Demo)
+                <span>Proceed to Secure Checkout</span>
+                <span class="checkout-arrow">→</span>
             </button>
-            <p class="checkout-note">
-                This is a demo. No real payment will be processed.
-            </p>
+            <button class="btn-clear-cart" id="clearCartBtn">Clear Entire Bag</button>
         </div>
     </aside>
 
     <!-- ============================================
-         CHECKOUT SUCCESS MODAL
-         Appears after a successful demo checkout
+         WISHLIST SIDEBAR DRAWER
+         ============================================ -->
+    <div class="drawer-overlay" id="wishlistOverlay"></div>
+    <aside class="drawer wishlist-drawer" id="wishlistSidebar" aria-label="Saved Wishlist">
+        <div class="drawer-header">
+            <div class="drawer-title-box">
+                <span class="drawer-icon">🤍</span>
+                <h3>Saved Wishlist (<span id="wishlistDrawerCount">0</span>)</h3>
+            </div>
+            <button class="drawer-close-btn" id="wishlistCloseBtn" aria-label="Close wishlist">✕</button>
+        </div>
+        <div class="wishlist-items-container" id="wishlistItems">
+            <!-- Rendered by JavaScript -->
+        </div>
+        <div class="wishlist-footer" id="wishlistFooter">
+            <button class="btn btn-primary btn-block" id="moveAllToCartBtn">Move All to Cart</button>
+        </div>
+    </aside>
+
+    <!-- ============================================
+         QUICK VIEW MODAL
+         ============================================ -->
+    <div class="modal-overlay" id="quickViewModal">
+        <div class="modal modal-quickview">
+            <button class="modal-close-btn" id="quickViewCloseBtn" aria-label="Close Quick View">✕</button>
+            <div class="quickview-body" id="quickViewBody">
+                <!-- Rendered by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         2-STEP CHECKOUT MODAL
          ============================================ -->
     <div class="modal-overlay" id="checkoutModal">
-        <div class="modal" id="modalContent">
-            <div class="modal-icon">✅</div>
-            <h2 class="modal-title">Order Confirmed!</h2>
-            <p class="modal-message">
-                Thank you for your order! This is a <strong>demo checkout</strong> — 
-                no real payment has been processed.
-            </p>
-            <p class="modal-total" id="modalTotal">Total: $0.00</p>
-            <button class="btn btn-primary" id="modalCloseBtn">
-                Continue Shopping
-            </button>
+        <div class="modal modal-checkout">
+            <button class="modal-close-btn" id="checkoutCloseBtn" aria-label="Close Checkout">✕</button>
+
+            <!-- Checkout Stepper -->
+            <div class="checkout-stepper">
+                <div class="step-item active" id="stepIndicator1">
+                    <span class="step-circle">1</span>
+                    <span class="step-label">Shipping Details</span>
+                </div>
+                <div class="step-divider"></div>
+                <div class="step-item" id="stepIndicator2">
+                    <span class="step-circle">2</span>
+                    <span class="step-label">Payment & Confirmation</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Customer & Shipping Details -->
+            <div class="checkout-step-content active" id="checkoutStep1">
+                <h3 class="checkout-step-title">📍 Where Should We Deliver?</h3>
+                <form id="shippingForm" class="checkout-form" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shipName">Full Name *</label>
+                            <input type="text" id="shipName" placeholder="Alex Morgan" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipEmail">Email Address *</label>
+                            <input type="email" id="shipEmail" placeholder="alex@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipAddress">Street Address *</label>
+                        <input type="text" id="shipAddress" placeholder="742 Evergreen Terrace, Suite 101" required>
+                    </div>
+                    <div class="form-row form-row-tri">
+                        <div class="form-group">
+                            <label for="shipCity">City *</label>
+                            <input type="text" id="shipCity" placeholder="San Francisco" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipZip">ZIP / Postal Code *</label>
+                            <input type="text" id="shipZip" placeholder="94107" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipCountry">Country *</label>
+                            <select id="shipCountry" required>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="checkout-btn-row">
+                        <button type="button" class="btn btn-outline" id="cancelCheckoutBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="goToPaymentBtn">Continue to Payment →</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 2: Payment Method -->
+            <div class="checkout-step-content" id="checkoutStep2">
+                <h3 class="checkout-step-title">💳 Secure Payment</h3>
+
+                <!-- Payment Method Tabs -->
+                <div class="payment-tabs">
+                    <button class="payment-tab active" data-method="card">💳 Credit Card</button>
+                    <button class="payment-tab" data-method="paypal">🅿️ PayPal</button>
+                    <button class="payment-tab" data-method="apple">🍏 Apple Pay</button>
+                </div>
+
+                <!-- Interactive Credit Card Visual Preview -->
+                <div class="card-visual-preview">
+                    <div class="card-chip"></div>
+                    <div class="card-number-preview" id="cardNumPreview">•••• •••• •••• ••••</div>
+                    <div class="card-meta-row">
+                        <div>
+                            <span class="card-label">CARD HOLDER</span>
+                            <span class="card-holder-preview" id="cardHolderPreview">YOUR NAME</span>
+                        </div>
+                        <div>
+                            <span class="card-label">EXPIRES</span>
+                            <span class="card-exp-preview" id="cardExpPreview">MM/YY</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <form id="paymentForm" class="checkout-form" novalidate>
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number</label>
+                        <input type="text" id="cardNumber" placeholder="4242 •••• •••• 4242" maxlength="19" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cardExp">Expiration Date</label>
+                            <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardCvc">CVC / Security Code</label>
+                            <input type="password" id="cardCvc" placeholder="•••" maxlength="4" required>
+                        </div>
+                    </div>
+
+                    <!-- Order Total Recap -->
+                    <div class="checkout-order-summary">
+                        <span>Total Due Today:</span>
+                        <strong id="checkoutFinalTotal" class="summary-total-price">$0.00</strong>
+                    </div>
+
+                    <div class="checkout-btn-row">
+                        <button type="button" class="btn btn-outline" id="backToShippingBtn">← Back</button>
+                        <button type="submit" class="btn btn-primary" id="placeOrderBtn">
+                            🔒 Complete Purchase
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         ORDER SUCCESS RECEIPT MODAL
+         ============================================ -->
+    <div class="modal-overlay" id="orderSuccessModal">
+        <div class="modal modal-success">
+            <div class="success-badge-icon">✅</div>
+            <h2 class="success-title">Order Placed Successfully!</h2>
+            <p class="success-subtitle">Thank you for your purchase. We have received your order and started preparing it.</p>
+
+            <div class="order-receipt-card">
+                <div class="receipt-header">
+                    <div>
+                        <span class="receipt-label">Order Number:</span>
+                        <strong class="receipt-order-id" id="receiptOrderId">#NEX-98241</strong>
+                    </div>
+                    <div>
+                        <span class="receipt-label">Date:</span>
+                        <span id="receiptDate">Oct 24, 2026</span>
+                    </div>
+                </div>
+
+                <div class="receipt-items-list" id="receiptItemsList"></div>
+
+                <div class="receipt-totals">
+                    <div class="receipt-row">
+                        <span>Subtotal:</span>
+                        <span id="receiptSubtotal">$0.00</span>
+                    </div>
+                    <div class="receipt-row" id="receiptDiscountRow" style="display: none;">
+                        <span>Discount:</span>
+                        <span id="receiptDiscount" class="text-success">-$0.00</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Tax:</span>
+                        <span id="receiptTax">$0.00</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Shipping:</span>
+                        <span id="receiptShipping">FREE</span>
+                    </div>
+                    <div class="receipt-row receipt-total-row">
+                        <span>Total Paid:</span>
+                        <strong id="receiptTotal">$0.00</strong>
+                    </div>
+                </div>
+
+                <div class="receipt-shipping-address" id="receiptAddressBox">
+                    <span class="receipt-label">Shipping To:</span>
+                    <p id="receiptCustomerAddress">Alex Morgan • 742 Evergreen Terrace</p>
+                </div>
+            </div>
+
+            <div class="success-actions">
+                <button class="btn btn-outline" id="printReceiptBtn">🖨️ Print Receipt</button>
+                <button class="btn btn-primary" id="continueShoppingBtn">Continue Shopping</button>
+            </div>
         </div>
     </div>
 
     <!-- ============================================
          FOOTER
-         Contains navigation, contact info, and copyright
          ============================================ -->
     <footer class="footer" id="contact">
-        <div class="container">
-            <div class="footer-grid">
-                <!-- Footer: About -->
-                <div class="footer-section">
-                    <h3 class="footer-logo">
-                        🛍️ Shop<span class="logo-accent">Ease</span>
-                    </h3>
-                    <p class="footer-about">
-                        Your one-stop destination for quality products at amazing prices.
-                        Shop with confidence and enjoy a seamless experience.
+        <div class="container footer-container">
+            <div class="footer-top-grid">
+                <!-- Brand Info -->
+                <div class="footer-column brand-col">
+                    <div class="footer-logo">
+                        <span class="logo-icon">✨</span>
+                        <span class="logo-title">Nex<span class="logo-accent">Commerce</span></span>
+                    </div>
+                    <p class="footer-description">
+                        Curating premium consumer technology, modern street apparel, and handcrafted accessories since 2024. Elevating standards with unmatched customer satisfaction.
                     </p>
+                    <div class="social-links">
+                        <a href="#footer" class="social-icon" aria-label="Twitter">🐦</a>
+                        <a href="#footer" class="social-icon" aria-label="Instagram">📸</a>
+                        <a href="#footer" class="social-icon" aria-label="GitHub">💻</a>
+                        <a href="#footer" class="social-icon" aria-label="LinkedIn">💼</a>
+                    </div>
                 </div>
 
-                <!-- Footer: Quick Links -->
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
+                <!-- Navigation Links -->
+                <div class="footer-column">
+                    <h4 class="footer-heading">Explore</h4>
                     <ul class="footer-links">
                         <li><a href="#home">Home</a></li>
-                        <li><a href="#products">Products</a></li>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#products">Flagship Catalog</a></li>
+                        <li><a href="#deals">Flash Sales</a></li>
+                        <li><a href="#reviews">Verified Reviews</a></li>
                     </ul>
                 </div>
 
-                <!-- Footer: Categories -->
-                <div class="footer-section">
-                    <h3>Categories</h3>
+                <!-- Categories -->
+                <div class="footer-column">
+                    <h4 class="footer-heading">Collections</h4>
                     <ul class="footer-links">
-                        <li><a href="#products">Electronics</a></li>
-                        <li><a href="#products">Fashion</a></li>
-                        <li><a href="#products">Accessories</a></li>
-                        <li><a href="#products">New Arrivals</a></li>
+                        <li><a href="#products" data-filter-category="electronics">Electronics & Audio</a></li>
+                        <li><a href="#products" data-filter-category="fashion">Street & Apparel</a></li>
+                        <li><a href="#products" data-filter-category="accessories">Timepieces & Gear</a></li>
+                        <li><a href="#deals">Limited Drops</a></li>
                     </ul>
                 </div>
 
-                <!-- Footer: Contact -->
-                <div class="footer-section">
-                    <h3>Contact Us</h3>
-                    <ul class="footer-contact">
-                        <li>📧 hello@shopease.com</li>
-                        <li>📞 +1 (555) 123-4567</li>
-                        <li>📍 123 Shopping Street, NY</li>
-                        <li>🕐 Mon-Fri: 9AM - 6PM</li>
+                <!-- Contact & Support -->
+                <div class="footer-column">
+                    <h4 class="footer-heading">Customer Care</h4>
+                    <ul class="footer-contact-list">
+                        <li><span>📍</span> 450 Lexington Ave, New York, NY</li>
+                        <li><span>📧</span> concierge@nexcommerce.io</li>
+                        <li><span>📞</span> +1 (800) 892-4190</li>
+                        <li><span>🕐</span> 24/7 Global Live Support</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Footer Bottom -->
+            <!-- Footer Bottom Strip -->
             <div class="footer-bottom">
-                <p>
-                    &copy; 2026 ShopEase. All rights reserved. | 
-                    Built for learning purposes 📚
-                </p>
+                <p>&copy; 2026 NexCommerce Global Ltd. All rights reserved. Built with precision & modern web standards.</p>
+                <div class="payment-badges">
+                    <span class="pay-badge">VISA</span>
+                    <span class="pay-badge">MASTERCARD</span>
+                    <span class="pay-badge">AMEX</span>
+                    <span class="pay-badge">APPLE PAY</span>
+                    <span class="pay-badge">PAYPAL</span>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- ===== Toast Notification (shown briefly after actions) ===== -->
-    <div class="toast" id="toast">
-        <span class="toast-icon" id="toastIcon">✅</span>
-        <span class="toast-message" id="toastMessage">Item added to cart!</span>
-    </div>
+    <!-- ============================================
+         FLOATING TOAST NOTIFICATION CONTAINER
+         ============================================ -->
+    <div class="toast-container" id="toastContainer"></div>
 
 </body>
 </html>
