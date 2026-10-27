@@ -7,6 +7,17 @@
     <meta name="description" content="NexCommerce - Premium Online Store with cutting-edge electronics, fashion, and luxury accessories. Enjoy fast worldwide shipping, secure checkout, and exclusive discounts.">
     <meta name="keywords" content="ecommerce, online shopping, electronics, fashion, accessories, premium store, best deals">
     <meta name="theme-color" content="#4f46e5">
+    <meta name="author" content="NexCommerce">
+    <meta name="robots" content="index, follow">
+    <!-- Open Graph -->
+    <meta property="og:title" content="NexCommerce | Flagship E-Commerce Experience">
+    <meta property="og:description" content="Premium electronics, fashion, and accessories. Fast worldwide shipping & secure checkout.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&auto=format&fit=crop&q=80">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NexCommerce | Flagship E-Commerce">
+    <meta name="twitter:description" content="Premium electronics, fashion, and luxury accessories.">
     <title>NexCommerce | Flagship E-Commerce Experience</title>
 
     <!-- ===== Favicon ===== -->
@@ -80,10 +91,17 @@
                 <a href="#products" class="nav-link">Catalog</a>
                 <a href="#deals" class="nav-link">Flash Deals</a>
                 <a href="#reviews" class="nav-link">Reviews</a>
+                <a href="#track" class="nav-link" id="navTrackOrderBtn">Track Order</a>
             </nav>
 
-            <!-- Actions Group (Theme, Wishlist, Cart) -->
+            <!-- Actions Group (Theme, Wishlist, Cart, API Status) -->
             <div class="header-actions">
+                <!-- Live Server Engine Indicator -->
+                <div class="api-status-pill" id="apiStatusPill" title="Server Status: Connecting...">
+                    <span class="status-dot"></span>
+                    <span class="status-label" id="apiStatusLabel">Connecting...</span>
+                </div>
+
                 <!-- Theme Mode Toggle -->
                 <button class="action-btn theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle dark/light mode" title="Toggle Theme">
                     <span class="theme-icon sun-icon">☀️</span>
@@ -120,6 +138,7 @@
                     <a href="#products" class="mobile-nav-link">📦 Products Catalog</a>
                     <a href="#deals" class="mobile-nav-link">⚡ Flash Deals</a>
                     <a href="#reviews" class="mobile-nav-link">⭐ Customer Reviews</a>
+                    <a href="#track" class="mobile-nav-link" id="mobileNavTrackOrderBtn">📦 Track Order</a>
                 </div>
                 <div class="mobile-nav-footer">
                     <div class="mobile-theme-row">
@@ -409,13 +428,16 @@
         <!-- ===== TESTIMONIALS / REVIEWS SECTION ===== -->
         <section class="reviews-section" id="reviews">
             <div class="container">
-                <div class="section-header text-center">
-                    <span class="section-badge">⭐ SOCIAL PROOF</span>
-                    <h2 class="section-title">Loved by Thousands Worldwide</h2>
-                    <p class="section-subtitle">Real experiences from verified buyers who upgraded their everyday gear.</p>
+                <div class="reviews-header-bar">
+                    <div>
+                        <span class="section-badge">⭐ SOCIAL PROOF</span>
+                        <h2 class="section-title">Loved by Thousands Worldwide</h2>
+                        <p class="section-subtitle">Real experiences from verified buyers who upgraded their everyday gear.</p>
+                    </div>
+                    <button class="btn btn-outline" id="openReviewModalBtn">✍️ Write a Review</button>
                 </div>
 
-                <div class="reviews-grid">
+                <div class="reviews-grid" id="reviewsGrid">
                     <div class="review-card">
                         <div class="review-stars">★★★★★</div>
                         <p class="review-comment">"The Sony XM5 headphones arrived in 2 days. The noise cancellation is pure magic during flights, and the packaging was immaculate!"</p>
@@ -768,6 +790,67 @@
     </div>
 
     <!-- ============================================
+         ORDER LOOKUP & TRACKING MODAL
+         ============================================ -->
+    <div class="modal-overlay" id="trackOrderModal">
+        <div class="modal modal-track">
+            <button class="modal-close-btn" id="trackOrderCloseBtn" aria-label="Close Order Tracker">✕</button>
+            <div class="track-modal-header">
+                <span class="track-icon">📦</span>
+                <h2>Track Your Order</h2>
+                <p>Enter your 6-character Order ID (e.g. <code>#NEX-11313</code>) to inspect live status & shipping progress.</p>
+            </div>
+            <form id="trackOrderForm" class="track-form" novalidate>
+                <div class="track-input-group">
+                    <input type="text" id="trackOrderInput" placeholder="#NEX-XXXXX" required autocomplete="off">
+                    <button type="submit" class="btn btn-primary">Locate Order</button>
+                </div>
+            </form>
+            <div class="track-result" id="trackOrderResult" style="display: none;"></div>
+            <div class="recent-orders-box" id="recentOrdersBox">
+                <h4>Your Recent Local Orders</h4>
+                <div class="recent-orders-list" id="recentOrdersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         WRITE A REVIEW MODAL
+         ============================================ -->
+    <div class="modal-overlay" id="writeReviewModal">
+        <div class="modal modal-review">
+            <button class="modal-close-btn" id="writeReviewCloseBtn" aria-label="Close Review Modal">✕</button>
+            <div class="review-modal-header">
+                <span class="review-badge-icon">✍️</span>
+                <h2>Share Your Experience</h2>
+                <p>We value genuine feedback. Your review helps other shoppers make informed choices.</p>
+            </div>
+            <form id="writeReviewForm" class="review-form" novalidate>
+                <div class="form-group">
+                    <label>Overall Rating</label>
+                    <div class="star-rating-select" id="starRatingSelect">
+                        <span class="star-select" data-rating="1">★</span>
+                        <span class="star-select" data-rating="2">★</span>
+                        <span class="star-select" data-rating="3">★</span>
+                        <span class="star-select" data-rating="4">★</span>
+                        <span class="star-select active" data-rating="5">★</span>
+                        <input type="hidden" id="reviewRatingInput" value="5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reviewAuthor">Your Name *</label>
+                    <input type="text" id="reviewAuthor" placeholder="e.g. Jordan Smith" required>
+                </div>
+                <div class="form-group">
+                    <label for="reviewComment">Your Review *</label>
+                    <textarea id="reviewComment" rows="4" placeholder="How did the product perform? Quality, speed of delivery, packaging..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Submit Verified Review</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
          FOOTER
          ============================================ -->
     <footer class="footer" id="contact">
@@ -842,6 +925,13 @@
          FLOATING TOAST NOTIFICATION CONTAINER
          ============================================ -->
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================
+         BACK TO TOP BUTTON
+         ============================================ -->
+    <button class="back-to-top" id="backToTopBtn" aria-label="Scroll back to top" title="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
 
 </body>
 </html>

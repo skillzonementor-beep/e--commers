@@ -1434,8 +1434,9 @@ h1, h2, h3, h4, h5, h6 {
     transition: all var(--transition-smooth);
 }
 
-.product-card:hover {
-    transform: translateY(-8px);
+.product-card:hover,
+.product-card.card-visible:hover {
+    transform: translateY(-8px) !important;
     box-shadow: var(--shadow-xl);
     border-color: rgba(79, 70, 229, 0.3);
 }
@@ -2936,3 +2937,511 @@ h1, h2, h3, h4, h5, h6 {
         align-items: stretch;
     }
 }
+
+/* ================================
+   BACK TO TOP BUTTON
+   ================================ */
+.back-to-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px var(--primary-glow), 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    cursor: pointer;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.back-to-top:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 8px 30px var(--primary-glow), 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.back-to-top:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* ================================
+   SCROLL-TRIGGERED ANIMATIONS
+   ================================ */
+.anim-hidden {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.anim-visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+/* Product card entrance animation */
+.card-anim {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-visible {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+/* ================================
+   DISCOUNT BADGE (Secondary)
+   ================================ */
+.discount-pct-badge {
+    margin-left: 4px;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%) !important;
+}
+
+/* ================================
+   REVIEW.JS MODEL — Review section
+   ================================ */
+.review-card {
+    animation: none;
+}
+
+.reviews-section .anim-visible .review-card:nth-child(1) {
+    animation: fadeInUp 0.5s ease 0.1s both;
+}
+.reviews-section .anim-visible .review-card:nth-child(2) {
+    animation: fadeInUp 0.5s ease 0.2s both;
+}
+.reviews-section .anim-visible .review-card:nth-child(3) {
+    animation: fadeInUp 0.5s ease 0.3s both;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================
+   HEADER SCROLL SHADOW ENHANCEMENT
+   ================================ */
+.header.scrolled {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+[data-theme="dark"] .header.scrolled {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* ================================
+   PRODUCT CARD HOVER DEPTH
+   ================================ */
+.product-card:hover {
+    z-index: 2;
+}
+/* Note: transform for hover is defined with card-visible rule above */
+
+
+/* ================================
+   CART BUTTON TOTAL RESPONSIVE
+   ================================ */
+@media (max-width: 900px) {
+    .header-cart-total {
+        display: none;
+    }
+}
+
+/* ================================
+   DARK MODE — IMPROVED CARD GLOW
+   ================================ */
+[data-theme="dark"] .product-card:hover {
+    box-shadow: 0 12px 40px rgba(79, 70, 229, 0.18), 0 4px 12px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .showcase-card {
+    box-shadow: 0 20px 60px rgba(79, 70, 229, 0.2), 0 8px 24px rgba(0,0,0,0.6);
+}
+
+[data-theme="dark"] .newsletter-card {
+    box-shadow: 0 0 60px rgba(79, 70, 229, 0.15);
+}
+
+/* ================================
+   SCROLLBAR STYLING
+   ================================ */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-card-subtle);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ================================
+   SELECTION COLOR
+   ================================ */
+::selection {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+[data-theme="dark"] ::selection {
+    background: rgba(79, 70, 229, 0.35);
+    color: #c7d2fe;
+}
+
+/* ================================
+   FOCUS VISIBLE (Accessibility)
+   ================================ */
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+/* ================================
+   PRINT STYLES (Receipt)
+   ================================ */
+@media print {
+    body > *:not(#orderSuccessModal) {
+        display: none !important;
+    }
+    #orderSuccessModal {
+        position: static !important;
+        display: block !important;
+        background: white !important;
+    }
+    .success-actions {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   24. ENTERPRISE LIVE STATUS PILL & NEW COMPONENTS
+   ========================================================================== */
+.api-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #10b981;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.api-status-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.api-status-pill.offline {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+}
+
+.api-status-pill.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
+    position: relative;
+}
+
+.status-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background-color: currentColor;
+    opacity: 0.4;
+    animation: statusPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+@keyframes statusPulse {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    50% { transform: scale(2.2); opacity: 0; }
+    100% { transform: scale(0.9); opacity: 0; }
+}
+
+/* Reviews Header Bar */
+.reviews-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Track Order Modal */
+.modal-track {
+    max-width: 580px;
+}
+
+.track-modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.track-icon {
+    font-size: 40px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.track-modal-header h2 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.track-modal-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.track-form {
+    margin-bottom: 24px;
+}
+
+.track-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.track-input-group input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-subtle);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.track-input-group input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.track-result-card {
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.track-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.track-status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+/* Shipping Timeline */
+.track-timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 24px 0 16px;
+}
+
+.track-timeline::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+.track-timeline-progress {
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    height: 3px;
+    background: var(--primary);
+    z-index: 2;
+    transition: width 0.5s ease;
+}
+
+.track-step {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.track-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 3px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    transition: all 0.3s ease;
+}
+
+.track-step.done .track-step-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.track-step.active .track-step-dot {
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+}
+
+.recent-orders-box {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.recent-orders-box h4 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.recent-order-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    margin: 4px;
+    border-radius: 6px;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.recent-order-pill:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+/* Write a Review Modal */
+.modal-review {
+    max-width: 500px;
+}
+
+.review-modal-header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.review-badge-icon {
+    font-size: 36px;
+    margin-bottom: 6px;
+    display: inline-block;
+}
+
+.star-rating-select {
+    display: flex;
+    gap: 8px;
+    font-size: 28px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 4px;
+}
+
+.star-select {
+    color: var(--border-color);
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.star-select.active,
+.star-select:hover,
+.star-select.hovered {
+    color: #f59e0b;
+    transform: scale(1.15);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+

@@ -354,11 +354,19 @@ document.addEventListener("DOMContentLoaded", () => {
     renderProducts();
     updateCartUI();
     updateWishlistUI();
+    updateCategoryCounts();
     initCountdownTimer();
     initAnnouncementTicker();
     initPromoClickToCopy();
     initHeroQuickAdd();
     initNewsletter();
+    initScrollAnimations();
+    initBackToTop();
+    initNavActiveOnScroll();
+    initServerTelemetry();
+    syncCatalogWithAPI();
+    initOrderTracker();
+    initReviewModal();
 });
 
 // ==========================================================================
@@ -381,6 +389,12 @@ function toggleTheme() {
 
 themeToggleBtn?.addEventListener("click", toggleTheme);
 mobileThemeBtn?.addEventListener("click", toggleTheme);
+
+// Header scroll effect
+const header = document.getElementById("header");
+window.addEventListener("scroll", () => {
+    header?.classList.toggle("scrolled", window.scrollY > 10);
+}, { passive: true });
 
 // ==========================================================================
 // 6. PRODUCT RENDERING & FILTERING
@@ -439,6 +453,9 @@ function renderProducts() {
         const isWishlisted = wishlist.some(item => item.id === product.id);
         const lowStock = product.stock <= 8;
         const stockPercent = Math.min(100, Math.round((product.stock / 30) * 100));
+        const discountPct = product.originalPrice
+            ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+            : 0;
 
         return `
             <div class="product-card" data-product-id="${product.id}">
@@ -454,6 +471,7 @@ function renderProducts() {
                     <!-- Badges -->
                     <div class="card-badges">
                         <span class="badge-tag ${product.badge}">${product.badgeText}</span>
+                        ${discountPct > 0 ? `<span class="badge-tag sale discount-pct-badge">-${discountPct}%</span>` : ''}
                     </div>
 
                     <!-- Quick Action Buttons -->
@@ -490,7 +508,7 @@ function renderProducts() {
                     <!-- Stock bar -->
                     <div class="stock-meter-box">
                         <div class="stock-meter-label ${lowStock ? 'low-stock' : ''}">
-                            <span>${lowStock ? `⚠️ Only ${product.stock} left in stock!` : `In Stock (${product.stock})`}</span>
+                            <span>${lowStock ? `⚠️ Only ${product.stock} left!` : `✅ In Stock (${product.stock})`}</span>
                         </div>
                         <div class="stock-bar-track">
                             <div class="stock-bar-fill ${lowStock ? 'low-stock' : ''}" style="width: ${stockPercent}%;"></div>
@@ -511,6 +529,9 @@ function renderProducts() {
             </div>
         `;
     }).join("");
+
+    // Re-initialize scroll animations for newly rendered cards
+    initCardScrollAnimations();
 }
 
 // ==========================================================================
@@ -1176,10 +1197,10 @@ cardNumberInput?.addEventListener("input", e => {
     let val = e.target.value.replace(/\D/g, "").substring(0, 16);
     let formatted = val.match(/.{1,4}/g)?.join(" ") || val;
     e.target.value = formatted;
-    cardNumPreview.textContent = formatted.padEnd(19, "•").replace(/•/g, (m, offset) => {
-        if (offset === 4 || offset === 9 || offset === 14) return " ";
-        return "•";
-    }) || "•••• •••• •••• ••••";
+    // Fix: build proper masked preview
+    const groups = (val + "0000000000000000").substring(0, 16).match(/.{1,4}/g) || [];
+    cardNumPreview.textContent = groups.join(" ").trim() || "•••• •••• •••• ••••";
+    if (!val) cardNumPreview.textContent = "•••• •••• •••• ••••";
 });
 
 cardExpInput?.addEventListener("input", e => {
@@ -1203,11 +1224,53 @@ document.querySelectorAll(".payment-tab").forEach(tab => {
 });
 
 // Final Order Submission
-paymentForm?.addEventListener("submit", e => {
+paymentForm?.addEventListener("submit", async e => {
     e.preventDefault();
     const totals = calculateTotals();
-    const orderId = `#NEX-${Math.floor(10000 + Math.random() * 90000)}`;
+    let orderId = `#NEX-${Math.floor(10000 + Math.random() * 90000)}`;
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+    // Attempt to persist order via API (with resilient offline fallback)
+    const orderPayload = {
+        customer: customerShippingInfo,
+        items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, variant: i.variant || null, image: i.image })),
+        pricing: {
+            subtotal: totals.subtotal,
+            discount: totals.discount,
+            promoCode: appliedPromo || null,
+            tax: totals.tax,
+            shipping: totals.shipping,
+            total: totals.total
+        },
+        paymentMethod: document.querySelector(".payment-tab.active")?.getAttribute("data-method") || "card"
+    };
+
+    try {
+        const res = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(orderPayload)
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.data?.orderId) orderId = data.data.orderId;
+        }
+    } catch (apiErr) {
+        // graceful offline fallback
+    }
+
+    // Save to local order tracking history
+    try {
+        const hist = JSON.parse(localStorage.getItem("nex_orders_history") || "[]");
+        hist.unshift({
+            orderId: orderId,
+            date: today,
+            total: totals.total,
+            itemsCount: cart.reduce((acc, it) => acc + it.quantity, 0),
+            status: "confirmed"
+        });
+        localStorage.setItem("nex_orders_history", JSON.stringify(hist.slice(0, 10)));
+    } catch (e) {}
 
     // Populate Receipt
     receiptOrderId.textContent = orderId;
@@ -1279,6 +1342,10 @@ function closeAllDrawersAndModals() {
     closeModal(quickViewModal);
     closeModal(checkoutModal);
     closeModal(orderSuccessModal);
+    const trackModal = document.getElementById("trackOrderModal");
+    const reviewModal = document.getElementById("writeReviewModal");
+    if (trackModal) closeModal(trackModal);
+    if (reviewModal) closeModal(reviewModal);
     mobileNav?.classList.remove("open");
     mobileMenuBtn?.classList.remove("active");
 }
@@ -1303,6 +1370,45 @@ checkoutModal?.addEventListener("click", e => {
 
 orderSuccessModal?.addEventListener("click", e => {
     if (e.target === orderSuccessModal) closeModal(orderSuccessModal);
+});
+
+// Track Order Modal Handlers
+const trackOrderModal = document.getElementById("trackOrderModal");
+const trackOrderCloseBtn = document.getElementById("trackOrderCloseBtn");
+const navTrackOrderBtn = document.getElementById("navTrackOrderBtn");
+const mobileNavTrackOrderBtn = document.getElementById("mobileNavTrackOrderBtn");
+
+navTrackOrderBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (trackOrderModal) openModal(trackOrderModal);
+    renderRecentOrdersList();
+});
+mobileNavTrackOrderBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeAllDrawersAndModals();
+    if (trackOrderModal) openModal(trackOrderModal);
+    renderRecentOrdersList();
+});
+trackOrderCloseBtn?.addEventListener("click", () => {
+    if (trackOrderModal) closeModal(trackOrderModal);
+});
+trackOrderModal?.addEventListener("click", e => {
+    if (e.target === trackOrderModal) closeModal(trackOrderModal);
+});
+
+// Write Review Modal Handlers
+const writeReviewModal = document.getElementById("writeReviewModal");
+const writeReviewCloseBtn = document.getElementById("writeReviewCloseBtn");
+const openReviewModalBtn = document.getElementById("openReviewModalBtn");
+
+openReviewModalBtn?.addEventListener("click", () => {
+    if (writeReviewModal) openModal(writeReviewModal);
+});
+writeReviewCloseBtn?.addEventListener("click", () => {
+    if (writeReviewModal) closeModal(writeReviewModal);
+});
+writeReviewModal?.addEventListener("click", e => {
+    if (e.target === writeReviewModal) closeModal(writeReviewModal);
 });
 
 // Mobile menu toggle
@@ -1423,36 +1529,424 @@ function initNewsletter() {
     document.getElementById("newsletterForm")?.addEventListener("submit", e => {
         e.preventDefault();
         const email = document.getElementById("newsletterEmail")?.value;
-        showToast("Welcome to VIP Club! Your 15% code is: VIP15", "🎉", "VIP Access Unlocked");
+        if (email) {
+            showToast("Welcome to VIP Club! Your 15% code is: VIP15", "🎉", "VIP Access Unlocked");
+        }
         e.target.reset();
     });
 }
 
 // ==========================================================================
-// 19. CONFETTI CELEBRATION EFFECT
+// 19. CATEGORY COUNTS UPDATER
+// ==========================================================================
+function updateCategoryCounts() {
+    const counts = { all: PRODUCTS.length, electronics: 0, fashion: 0, accessories: 0 };
+    PRODUCTS.forEach(p => { if (counts[p.category] !== undefined) counts[p.category]++; });
+    const countAll = document.getElementById("countAll");
+    const countElectronics = document.getElementById("countElectronics");
+    const countFashion = document.getElementById("countFashion");
+    const countAccessories = document.getElementById("countAccessories");
+    if (countAll) countAll.textContent = counts.all;
+    if (countElectronics) countElectronics.textContent = counts.electronics;
+    if (countFashion) countFashion.textContent = counts.fashion;
+    if (countAccessories) countAccessories.textContent = counts.accessories;
+}
+
+// ==========================================================================
+// 20. SCROLL ANIMATIONS (IntersectionObserver)
+// ==========================================================================
+function initScrollAnimations() {
+    // Animate sections on scroll
+    const sections = document.querySelectorAll(".trust-strip, .deals-section, .reviews-section, .newsletter-section");
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("anim-visible");
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    sections.forEach(el => {
+        el.classList.add("anim-hidden");
+        observer.observe(el);
+    });
+    initCardScrollAnimations();
+}
+
+function initCardScrollAnimations() {
+    const cards = document.querySelectorAll(".product-card:not(.anim-done)");
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add("card-visible");
+                    entry.target.classList.add("anim-done");
+                }, i * 60);
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+    cards.forEach(card => {
+        card.classList.add("card-anim");
+        cardObserver.observe(card);
+    });
+}
+
+// ==========================================================================
+// 21. BACK TO TOP BUTTON
+// ==========================================================================
+function initBackToTop() {
+    const btn = document.getElementById("backToTopBtn");
+    if (!btn) return;
+    window.addEventListener("scroll", () => {
+        btn.classList.toggle("visible", window.scrollY > 500);
+    }, { passive: true });
+    btn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+}
+
+// ==========================================================================
+// 22. ACTIVE NAV LINK ON SCROLL
+// ==========================================================================
+function initNavActiveOnScroll() {
+    const sections = document.querySelectorAll("section[id], footer[id]");
+    const navLinks = document.querySelectorAll(".nav-link");
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute("id");
+                navLinks.forEach(link => {
+                    link.classList.toggle("active", link.getAttribute("href") === `#${id}`);
+                });
+            }
+        });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    sections.forEach(sec => observer.observe(sec));
+}
+
+// ==========================================================================
+// 23. CONFETTI CELEBRATION EFFECT (Enhanced)
 // ==========================================================================
 function triggerConfetti() {
-    for (let i = 0; i < 40; i++) {
+    const colors = ["#4f46e5", "#ec4899", "#10b981", "#f59e0b", "#06b6d4", "#f43f5e", "#8b5cf6", "#fbbf24"];
+    const shapes = ["circle", "square", "rect"];
+
+    for (let i = 0; i < 80; i++) {
         const conf = document.createElement("div");
-        conf.style.position = "fixed";
-        conf.style.zIndex = "999";
-        conf.style.width = `${Math.random() * 10 + 6}px`;
-        conf.style.height = `${Math.random() * 10 + 6}px`;
-        conf.style.backgroundColor = ["#4f46e5", "#ec4899", "#10b981", "#f59e0b", "#06b6d4"][Math.floor(Math.random() * 5)];
-        conf.style.left = `${Math.random() * 100}vw`;
-        conf.style.top = "-20px";
-        conf.style.borderRadius = "2px";
-        conf.style.opacity = "1";
-        conf.style.transform = `rotate(${Math.random() * 360}deg)`;
-        conf.style.transition = `top ${Math.random() * 2 + 1.5}s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 2s ease, transform 2s ease`;
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const size = Math.random() * 12 + 6;
+        conf.style.cssText = [
+            "position: fixed",
+            "z-index: 9999",
+            `width: ${shape === 'rect' ? size * 2 : size}px`,
+            `height: ${size}px`,
+            `background-color: ${colors[Math.floor(Math.random() * colors.length)]}`,
+            `left: ${Math.random() * 100}vw`,
+            "top: -20px",
+            `border-radius: ${shape === 'circle' ? '50%' : shape === 'square' ? '2px' : '2px'}`,
+            "opacity: 1",
+            `transform: rotate(${Math.random() * 360}deg)`,
+            `transition: top ${Math.random() * 2 + 2}s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity ${Math.random() + 2}s ease, transform ${Math.random() * 2 + 2}s ease`
+        ].join(";");
         document.body.appendChild(conf);
 
         setTimeout(() => {
-            conf.style.top = "105vh";
+            conf.style.top = `${90 + Math.random() * 20}vh`;
             conf.style.opacity = "0";
-            conf.style.transform = `rotate(${Math.random() * 720}deg) scale(0.5)`;
-        }, 50);
+            conf.style.transform = `rotate(${Math.random() * 720}deg) scale(0.3)`;
+        }, 50 + i * 15);
 
-        setTimeout(() => conf.remove(), 2500);
+        setTimeout(() => conf.remove(), 4500);
     }
 }
+
+// ==========================================================================
+// 24. SERVER HEALTH TELEMETRY & LIVE API STATUS
+// ==========================================================================
+let serverTelemetryData = null;
+
+async function initServerTelemetry() {
+    const pill = document.getElementById("apiStatusPill");
+    const label = document.getElementById("apiStatusLabel");
+    if (!pill || !label) return;
+
+    try {
+        const tStart = performance.now();
+        const res = await fetch("/api/health");
+        const latency = Math.round(performance.now() - tStart);
+
+        if (res.ok) {
+            const data = await res.json();
+            serverTelemetryData = { ...data, latency };
+            const mode = data.database?.connectionMode === "mongodb" ? "MongoDB" : "Memory Engine";
+            pill.className = "api-status-pill";
+            label.textContent = `API Live (${mode})`;
+            pill.title = `Connected to ${data.service} v${data.version} | Latency: ${latency}ms | Store: ${data.database?.activeStore}`;
+        } else {
+            throw new Error("API responded with error");
+        }
+    } catch (e) {
+        pill.className = "api-status-pill offline";
+        label.textContent = "Offline Mode";
+        pill.title = "Running on resilient local in-memory storage (Server offline or static preview).";
+    }
+
+    pill.addEventListener("click", () => {
+        if (serverTelemetryData) {
+            showToast(
+                `Backend: ${serverTelemetryData.service} v${serverTelemetryData.version}\n` +
+                `Store: ${serverTelemetryData.database?.activeStore}\n` +
+                `Latency: ${serverTelemetryData.latency}ms • Uptime: ${serverTelemetryData.uptimeSeconds}s`,
+                "⚡",
+                "System Diagnostics"
+            );
+        } else {
+            showToast("Operating in resilient Local Client Mode with local storage persistence.", "ℹ️", "Offline Engine");
+        }
+    });
+}
+
+// ==========================================================================
+// 25. DYNAMIC CATALOG SYNC WITH REST API
+// ==========================================================================
+async function syncCatalogWithAPI() {
+    try {
+        const res = await fetch("/api/products?limit=50");
+        if (res.ok) {
+            const result = await res.json();
+            if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+                // Merge or update local master catalog
+                PRODUCTS.length = 0;
+                PRODUCTS.push(...result.data);
+                renderProducts();
+                updateCategoryCounts();
+            }
+        }
+    } catch (err) {
+        // Transparent fallback to local static data
+    }
+}
+
+// ==========================================================================
+// 26. ORDER LOOKUP & TRACKING ENGINE
+// ==========================================================================
+function initOrderTracker() {
+    const form = document.getElementById("trackOrderForm");
+    const input = document.getElementById("trackOrderInput");
+    const resultBox = document.getElementById("trackOrderResult");
+
+    form?.addEventListener("submit", async e => {
+        e.preventDefault();
+        const query = (input?.value || "").trim().toUpperCase();
+        if (!query) return;
+
+        resultBox.style.display = "block";
+        resultBox.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                <span>🔍 Querying order registry for <strong>${query}</strong>...</span>
+            </div>
+        `;
+
+        try {
+            // First check local history
+            const hist = JSON.parse(localStorage.getItem("nex_orders_history") || "[]");
+            const localMatch = hist.find(o => o.orderId.toUpperCase() === query);
+
+            // Attempt API fetch
+            let remoteOrder = null;
+            try {
+                const enc = encodeURIComponent(query);
+                const res = await fetch(`/api/orders/${enc}`);
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.success) remoteOrder = json.data;
+                }
+            } catch (netErr) {}
+
+            const order = remoteOrder || localMatch;
+
+            if (!order) {
+                resultBox.innerHTML = `
+                    <div class="track-result-card" style="border-color: rgba(239, 68, 68, 0.4);">
+                        <div style="display: flex; align-items: center; gap: 10px; color: #ef4444; font-weight: 700; margin-bottom: 6px;">
+                            <span>⚠️</span> Order Not Found
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+                            No order found matching "<strong>${query}</strong>". Please ensure the Order ID is formatted like <code>#NEX-12345</code>.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate progress status
+            const status = order.status || "confirmed";
+            const progressPercent = status === "delivered" ? 100 : status === "shipped" ? 66 : status === "processing" ? 33 : 10;
+
+            const itemsListHtml = Array.isArray(order.items) && order.items.length > 0
+                ? `<div style="margin-top: 14px; font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                    <span style="font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Items Ordered:</span>
+                    <ul style="margin: 6px 0 0; padding-left: 18px; color: var(--text-secondary);">
+                        ${order.items.map(it => `<li>${it.quantity}x ${it.name} — $${(it.price * it.quantity).toFixed(2)}</li>`).join("")}
+                    </ul>
+                   </div>`
+                : "";
+
+            resultBox.innerHTML = `
+                <div class="track-result-card">
+                    <div class="track-meta-row">
+                        <div>
+                            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Order ID</span>
+                            <div style="font-family: var(--font-heading); font-size: 18px; font-weight: 800; color: var(--text-primary);">${order.orderId}</div>
+                        </div>
+                        <span class="track-status-badge">● ${status.toUpperCase()}</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 12px; color: var(--text-secondary);">
+                        <span>Placed On: <strong>${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : (order.date || "Today")}</strong></span>
+                        <span>Total: <strong style="color: var(--text-primary);">$${(order.pricing?.total || order.total || 0).toFixed(2)}</strong></span>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="track-timeline">
+                        <div class="track-timeline-progress" style="width: ${progressPercent}%;"></div>
+                        <div class="track-step ${progressPercent >= 10 ? 'done' : 'active'}">
+                            <div class="track-step-dot">✓</div>
+                            <span>Placed</span>
+                        </div>
+                        <div class="track-step ${progressPercent >= 33 ? 'done' : (progressPercent >= 10 ? 'active' : '')}">
+                            <div class="track-step-dot">📦</div>
+                            <span>Packed</span>
+                        </div>
+                        <div class="track-step ${progressPercent >= 66 ? 'done' : (progressPercent >= 33 ? 'active' : '')}">
+                            <div class="track-step-dot">🚚</div>
+                            <span>Shipped</span>
+                        </div>
+                        <div class="track-step ${progressPercent >= 100 ? 'done' : (progressPercent >= 66 ? 'active' : '')}">
+                            <div class="track-step-dot">🏠</div>
+                            <span>Delivered</span>
+                        </div>
+                    </div>
+
+                    ${itemsListHtml}
+                </div>
+            `;
+        } catch (err) {
+            resultBox.innerHTML = `<div class="track-result-card"><p style="color: #ef4444; margin: 0;">Error checking order registry.</p></div>`;
+        }
+    });
+}
+
+function renderRecentOrdersList() {
+    const container = document.getElementById("recentOrdersList");
+    const box = document.getElementById("recentOrdersBox");
+    if (!container || !box) return;
+
+    const hist = JSON.parse(localStorage.getItem("nex_orders_history") || "[]");
+    if (hist.length === 0) {
+        box.style.display = "none";
+        return;
+    }
+
+    box.style.display = "block";
+    container.innerHTML = hist.map(o => `
+        <button type="button" class="recent-order-pill" onclick="document.getElementById('trackOrderInput').value='${o.orderId}'; document.getElementById('trackOrderForm').dispatchEvent(new Event('submit'));">
+            <span>📦</span>
+            <span>${o.orderId}</span>
+            <span style="color: var(--text-muted); font-size: 11px;">$${o.total.toFixed(2)}</span>
+        </button>
+    `).join("");
+}
+
+// ==========================================================================
+// 27. VERIFIED REVIEWS SUBMISSION ENGINE
+// ==========================================================================
+function initReviewModal() {
+    const starsContainer = document.getElementById("starRatingSelect");
+    const ratingInput = document.getElementById("reviewRatingInput");
+    const form = document.getElementById("writeReviewForm");
+    const modal = document.getElementById("writeReviewModal");
+    const reviewsGrid = document.getElementById("reviewsGrid");
+
+    if (starsContainer && ratingInput) {
+        const stars = starsContainer.querySelectorAll(".star-select");
+        stars.forEach(star => {
+            star.addEventListener("click", () => {
+                const val = parseInt(star.getAttribute("data-rating"), 10);
+                ratingInput.value = val;
+                stars.forEach((s, idx) => {
+                    s.classList.toggle("active", idx < val);
+                });
+            });
+            star.addEventListener("mouseenter", () => {
+                const val = parseInt(star.getAttribute("data-rating"), 10);
+                stars.forEach((s, idx) => {
+                    s.classList.toggle("hovered", idx < val);
+                });
+            });
+            starsContainer.addEventListener("mouseleave", () => {
+                const val = parseInt(ratingInput.value, 10);
+                stars.forEach((s, idx) => {
+                    s.classList.remove("hovered");
+                    s.classList.toggle("active", idx < val);
+                });
+            });
+        });
+    }
+
+    form?.addEventListener("submit", async e => {
+        e.preventDefault();
+        const author = document.getElementById("reviewAuthor")?.value.trim();
+        const comment = document.getElementById("reviewComment")?.value.trim();
+        const rating = parseInt(ratingInput?.value || "5", 10);
+
+        if (!author || !comment) return;
+
+        const reviewPayload = {
+            author,
+            comment,
+            rating,
+            role: "Verified Buyer",
+            avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80`
+        };
+
+        // Post to API (with fallback)
+        try {
+            await fetch("/api/reviews", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(reviewPayload)
+            });
+        } catch (apiErr) {}
+
+        // Prepend to UI grid
+        if (reviewsGrid) {
+            const starString = "★".repeat(rating) + "☆".repeat(5 - rating);
+            const reviewCard = document.createElement("div");
+            reviewCard.className = "review-card anim-visible";
+            reviewCard.style.animation = "fadeIn 0.5s ease";
+            reviewCard.innerHTML = `
+                <div class="review-stars">${starString}</div>
+                <p class="review-comment">"${comment}"</p>
+                <div class="review-author">
+                    <img src="${reviewPayload.avatar}" alt="${author}" class="author-avatar">
+                    <div>
+                        <strong>${author}</strong>
+                        <span class="author-role">Verified Buyer • Just now</span>
+                    </div>
+                </div>
+            `;
+            reviewsGrid.prepend(reviewCard);
+        }
+
+        form.reset();
+        if (ratingInput) ratingInput.value = 5;
+        starsContainer?.querySelectorAll(".star-select").forEach(s => s.classList.add("active"));
+
+        if (modal) closeModal(modal);
+        showToast("Thank you! Your verified review has been published.", "⭐", "Review Published");
+        triggerConfetti();
+    });
+}
+
