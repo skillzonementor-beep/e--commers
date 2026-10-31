@@ -480,10 +480,87 @@ app.get('/api/orders', async (req, res) => {
 });
 
 /**
- * GET /api/promo/:code
+ * GET /api/promos
+ * List all active promotional discount codes
+ */
+app.get('/api/promos', async (req, res) => {
+    try {
+        if (usesMongo()) {
+            const promos = await Promo.find({ isActive: true }).select('-__v').lean();
+            return res.json({ success: true, data: promos });
+        }
+        res.json({ success: true, data: memoryStore.promos.filter(p => p.isActive) });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Failed to fetch promotional offers' });
+    }
+});
+
+/**
+ * POST /api/promos/validate
+ * Validates promo code against a cart subtotal and calculates discount
+ */
+app.post('/api/promos/validate', async (req, res) => {
+    try {
+        const { code, subtotal } = req.body;
+        if (!code) {
+            return res.status(400).json({ success: false, error: 'Promo code is required' });
+        }
+
+        const normalizedCode = code.trim().toUpperCase();
+        const promo = usesMongo()
+            ? await Promo.findOne({ code: normalizedCode, isActive: true }).lean()
+            : memoryStore.promos.find(p => p.code === normalizedCode && p.isActive);
+
+        if (!promo) {
+            return res.status(404).json({ success: false, valid: false, error: `Promo code "${normalizedCode}" is invalid or expired` });
+        }
+
+        const cartSubtotal = typeof subtotal === 'number' ? subtotal : parseFloat(subtotal || '0');
+        const minOrder = promo.minOrder || 0;
+
+        if (cartSubtotal < minOrder) {
+            return res.status(400).json({
+                success: false,
+                valid: false,
+                error: `Promo code ${promo.code} requires a minimum order of $${minOrder.toFixed(2)}. Your current subtotal is $${cartSubtotal.toFixed(2)}.`,
+                minOrderRequired: minOrder
+            });
+        }
+
+        let discount = 0;
+        let isFreeShipping = false;
+
+        if (promo.type === 'percent') {
+            discount = parseFloat((cartSubtotal * promo.value).toFixed(2));
+        } else if (promo.type === 'fixed') {
+            discount = parseFloat(Math.min(cartSubtotal, promo.value).toFixed(2));
+        } else if (promo.type === 'shipping') {
+            isFreeShipping = true;
+        }
+
+        res.json({
+            success: true,
+            valid: true,
+            data: {
+                code: promo.code,
+                type: promo.type,
+                value: promo.value,
+                label: promo.label,
+                minOrder: promo.minOrder || 0,
+                discount,
+                isFreeShipping
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Failed to validate promo code' });
+    }
+});
+
+/**
+ * GET /api/promo/:code and GET /api/promos/:code
  * Validate promotional coupon codes
  */
-app.get('/api/promo/:code', async (req, res) => {
+const handleGetPromo = async (req, res) => {
     try {
         const code = req.params.code.trim().toUpperCase();
         const promo = usesMongo()
@@ -505,6 +582,54 @@ app.get('/api/promo/:code', async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ success: false, error: 'Failed to evaluate promo code' });
+    }
+};
+
+app.get('/api/promo/:code', handleGetPromo);
+app.get('/api/promos/:code', handleGetPromo);
+
+/**
+ * POST /api/promos
+ * Create a new promotional discount code (Admin)
+ */
+app.post('/api/promos', async (req, res) => {
+    try {
+        const { code, type, value, label, minOrder } = req.body;
+        if (!code || !type || value === undefined || !label) {
+            return res.status(400).json({ success: false, error: 'Missing mandatory fields (code, type, value, label)' });
+        }
+
+        const validTypes = ['percent', 'fixed', 'shipping'];
+        if (!validTypes.includes(type)) {
+            return res.status(400).json({ success: false, error: `Invalid promo type. Must be one of: ${validTypes.join(', ')}` });
+        }
+
+        const newPromo = {
+            code: code.trim().toUpperCase(),
+            type,
+            value: parseFloat(value),
+            label: label.trim(),
+            minOrder: minOrder ? parseFloat(minOrder) : 0,
+            isActive: true
+        };
+
+        if (usesMongo()) {
+            const created = await Promo.create(newPromo);
+            return res.status(201).json({ success: true, data: created });
+        }
+
+        const existingIdx = memoryStore.promos.findIndex(p => p.code === newPromo.code);
+        if (existingIdx >= 0) {
+            memoryStore.promos[existingIdx] = newPromo;
+        } else {
+            memoryStore.promos.push(newPromo);
+        }
+        res.status(201).json({ success: true, data: newPromo });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({ success: false, error: 'A promo code with this name already exists' });
+        }
+        res.status(500).json({ success: false, error: 'Failed to create promotional code' });
     }
 });
 

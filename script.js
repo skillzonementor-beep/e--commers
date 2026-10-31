@@ -203,11 +203,11 @@ const PRODUCTS = [
     }
 ];
 
-// Valid Promo Codes
+// Valid Promo Codes (includes minimum order rules matching Promo.js schema)
 const PROMO_CODES = {
-    "WELCOME20": { type: "percent", value: 0.20, label: "20% OFF" },
-    "SAVE10": { type: "fixed", value: 10.00, label: "$10 OFF" },
-    "FREESHIP": { type: "shipping", value: 0, label: "FREE SHIPPING" }
+    "WELCOME20": { type: "percent", value: 0.20, label: "20% OFF", minOrder: 0 },
+    "SAVE10": { type: "fixed", value: 10.00, label: "$10 OFF", minOrder: 50 },
+    "FREESHIP": { type: "shipping", value: 0, label: "FREE SHIPPING", minOrder: 30 }
 };
 
 // ==========================================================================
@@ -804,12 +804,15 @@ function calculateTotals() {
 
     if (appliedPromo && PROMO_CODES[appliedPromo]) {
         const promo = PROMO_CODES[appliedPromo];
-        if (promo.type === "percent") {
-            discount = subtotal * promo.value;
-        } else if (promo.type === "fixed") {
-            discount = Math.min(subtotal, promo.value);
-        } else if (promo.type === "shipping") {
-            freeShippingFromPromo = true;
+        const minOrder = promo.minOrder || 0;
+        if (subtotal >= minOrder) {
+            if (promo.type === "percent") {
+                discount = subtotal * promo.value;
+            } else if (promo.type === "fixed") {
+                discount = Math.min(subtotal, promo.value);
+            } else if (promo.type === "shipping") {
+                freeShippingFromPromo = true;
+            }
         }
     }
 
@@ -932,20 +935,62 @@ promoInput?.addEventListener("keydown", e => {
     }
 });
 
-function handleApplyPromo() {
+async function handleApplyPromo() {
     const code = promoInput.value.trim().toUpperCase();
     if (!code) return;
 
+    const totals = calculateTotals();
+    const currentSubtotal = totals.subtotal;
+
+    // Check with backend API first for dynamic promo validation
+    try {
+        const response = await fetch('/api/promos/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, subtotal: currentSubtotal })
+        });
+        const result = await response.json();
+
+        if (response.ok && result.success && result.valid) {
+            PROMO_CODES[code] = {
+                type: result.data.type,
+                value: result.data.value,
+                label: result.data.label,
+                minOrder: result.data.minOrder || 0
+            };
+            appliedPromo = code;
+            localStorage.setItem("nex_promo", JSON.stringify(code));
+            updateCartUI();
+            promoFeedback.style.color = "var(--success)";
+            promoFeedback.textContent = `✓ Code ${code} applied successfully! (${result.data.label})`;
+            showToast(`Promo ${code} applied!`, "🎉");
+            return;
+        } else if (result.error) {
+            promoFeedback.style.color = "var(--danger)";
+            promoFeedback.textContent = `✕ ${result.error}`;
+            return;
+        }
+    } catch (_err) {
+        // Fallback to local evaluation if offline
+    }
+
+    // Local in-memory fallback
     if (PROMO_CODES[code]) {
+        const promo = PROMO_CODES[code];
+        if (promo.minOrder && currentSubtotal < promo.minOrder) {
+            promoFeedback.style.color = "var(--danger)";
+            promoFeedback.textContent = `✕ Code ${code} requires a minimum order of $${promo.minOrder.toFixed(2)}.`;
+            return;
+        }
         appliedPromo = code;
         localStorage.setItem("nex_promo", JSON.stringify(code));
         updateCartUI();
         promoFeedback.style.color = "var(--success)";
-        promoFeedback.textContent = `✓ Code ${code} applied successfully! (${PROMO_CODES[code].label})`;
+        promoFeedback.textContent = `✓ Code ${code} applied successfully! (${promo.label})`;
         showToast(`Promo ${code} applied!`, "🎉");
     } else {
         promoFeedback.style.color = "var(--danger)";
-        promoFeedback.textContent = "✕ Invalid promo code. Try WELCOME20 or SAVE10.";
+        promoFeedback.textContent = "✕ Invalid promo code. Try WELCOME20, SAVE10, or FREESHIP.";
     }
 }
 
