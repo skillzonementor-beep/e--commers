@@ -50,7 +50,10 @@ Powered by **Node.js**, **Express**, **Mongoose**, **Helmet**, **CORS**, **Rate-
 | `POST` | `/api/orders` | Place order, deduct inventory stock, generate order receipt |
 | `GET` | `/api/orders/:orderId` | Query order details & tracking status |
 | `GET` | `/api/orders` | List recent orders |
+| `GET` | `/api/promos` | List active promotional offers & coupon codes |
+| `POST` | `/api/promos/validate` | Validate coupon code against subtotal, check minOrder & compute discount |
 | `GET` | `/api/promo/:code` | Validate promo code, discount type, and minimum order rules |
+| `POST` | `/api/promos` | Create new promotional discount code (Admin) |
 | `GET` | `/api/reviews` | Retrieve verified customer testimonials |
 | `POST` | `/api/reviews` | Submit new customer review |
 

@@ -732,14 +732,42 @@ async function bootstrap() {
         console.log(`📦 Loaded ${memoryStore.products.length} catalog items into High-Availability Engine.`);
     }
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`\n🚀 Server is live & ready for production traffic:`);
         console.log(`   → Storefront: http://localhost:${PORT}`);
         console.log(`   → Health API: http://localhost:${PORT}/api/health`);
         console.log(`   → Products:   http://localhost:${PORT}/api/products`);
+        console.log(`   → Promos:     http://localhost:${PORT}/api/promos`);
         console.log(`   → Engine:     ${getDbStatus().connectionMode.toUpperCase()}`);
         console.log(`   → Mode:       ${process.env.NODE_ENV || 'development'}\n`);
     });
+
+    // Graceful Shutdown Handler for Container Orchestration & Production Process Managers
+    const gracefulShutdown = (signal) => {
+        console.log(`\n🛑 Received ${signal}. Initiating graceful shutdown...`);
+        server.close(async () => {
+            console.log('HTTP connections closed.');
+            if (usesMongo()) {
+                try {
+                    const mongoose = require('mongoose');
+                    await mongoose.connection.close(false);
+                    console.log('MongoDB connection closed.');
+                } catch (closeErr) {
+                    console.error('Error closing MongoDB connection:', closeErr.message);
+                }
+            }
+            process.exit(0);
+        });
+
+        // Forced termination timeout after 10 seconds
+        setTimeout(() => {
+            console.error('⚠️ Forcing server shutdown after timeout.');
+            process.exit(1);
+        }, 10000).unref();
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 bootstrap().catch(err => {
