@@ -59,6 +59,56 @@ Powered by **Node.js**, **Express**, **Mongoose**, **Helmet**, **CORS**, **Rate-
 
 ---
 
+## 🌐 Complete URL Directory & Page Routes
+
+### 🖥️ Frontend Storefront Pages & Section URLs
+Accessible directly in the browser when running locally (default: `http://localhost:5000`):
+
+| Page / Section | URL / Route | Description |
+|---|---|---|
+| **Main Storefront** | [`http://localhost:5000/`](http://localhost:5000/) | Flagship home page, hero banner, announcement ticker, live telemetry |
+| **Hero & Trending** | [`http://localhost:5000/#home`](http://localhost:5000/#home) | Hero showcase with real-time shopping statistics & badges |
+| **Featured Drops** | [`http://localhost:5000/#featured`](http://localhost:5000/#featured) | Curated spotlight products with fast-buy action triggers |
+| **Products Catalog** | [`http://localhost:5000/#products`](http://localhost:5000/#products) | Interactive catalog with live search, price slider, and grid/list views |
+| **Categories Hub** | [`http://localhost:5000/#categories`](http://localhost:5000/#categories) | Department tabs (Electronics, Fashion, Luxury Accessories) |
+| **Order Tracking** | [`http://localhost:5000/#tracking`](http://localhost:5000/#tracking) | Live order lookup & timeline (`#NEX-XXXXX` tracking) |
+| **Customer Reviews** | [`http://localhost:5000/#reviews`](http://localhost:5000/#reviews) | Verified customer testimonials and interactive review submission |
+| **About Us** | [`http://localhost:5000/#about`](http://localhost:5000/#about) | Brand story, values, warranty, and customer commitments |
+| **Contact & Support** | [`http://localhost:5000/#contact`](http://localhost:5000/#contact) | Customer support desk, email, live chat links, and FAQ |
+| **Cart Drawer** | *Interactive Drawer* | Slide-out bag with free shipping meter, quantity controls, promo input |
+| **Wishlist Drawer** | *Interactive Drawer* | Saved favorites with batch "Move All to Bag" functionality |
+| **2-Step Checkout** | *Interactive Modal* | Shipping address form, payment selector, and live 3D card preview |
+
+---
+
+### 🔌 Backend REST API URL Directory
+
+| Endpoint | Method | Full Example URL | Purpose |
+|---|---|---|---|
+| **Health Telemetry** | `GET` | [`http://localhost:5000/api/health`](http://localhost:5000/api/health) | Live engine diagnostics, uptime, and DB mode |
+| **Store Metrics** | `GET` | [`http://localhost:5000/api/stats`](http://localhost:5000/api/stats) | Real-time sales, order counts, and revenue |
+| **All Products** | `GET` | [`http://localhost:5000/api/products`](http://localhost:5000/api/products) | Master catalog with 12 items |
+| **Electronics** | `GET` | [`http://localhost:5000/api/products?category=electronics`](http://localhost:5000/api/products?category=electronics) | Filter by Electronics category |
+| **Fashion** | `GET` | [`http://localhost:5000/api/products?category=fashion`](http://localhost:5000/api/products?category=fashion) | Filter by Fashion category |
+| **Accessories** | `GET` | [`http://localhost:5000/api/products?category=accessories`](http://localhost:5000/api/products?category=accessories) | Filter by Accessories category |
+| **Catalog Search** | `GET` | [`http://localhost:5000/api/products?search=Sony`](http://localhost:5000/api/products?search=Sony) | Live keyword search across title & specs |
+| **Price Filter & Sort**| `GET` | [`http://localhost:5000/api/products?minPrice=50&maxPrice=300&sort=price-low`](http://localhost:5000/api/products?minPrice=50&maxPrice=300&sort=price-low) | Price range and sorting |
+| **In-Stock Only** | `GET` | [`http://localhost:5000/api/products?inStock=true`](http://localhost:5000/api/products?inStock=true) | Filter available items |
+| **Product Detail** | `GET` | [`http://localhost:5000/api/products/1`](http://localhost:5000/api/products/1) | Numeric product lookup |
+| **Create Product** | `POST` | `http://localhost:5000/api/products` | Create catalog item (Admin) |
+| **Categories Aggregation** | `GET` | [`http://localhost:5000/api/categories`](http://localhost:5000/api/categories) | Category list with item counts |
+| **Active Promos** | `GET` | [`http://localhost:5000/api/promos`](http://localhost:5000/api/promos) | List active coupon codes |
+| **Validate Promo** | `POST` | `http://localhost:5000/api/promos/validate` | Validate code against cart subtotal |
+| **Promo Code Lookup**| `GET` | [`http://localhost:5000/api/promo/WELCOME20`](http://localhost:5000/api/promo/WELCOME20) | Specific coupon details |
+| **Create Promo** | `POST` | `http://localhost:5000/api/promos` | Create coupon campaign (Admin) |
+| **Submit Order** | `POST` | `http://localhost:5000/api/orders` | Place order & deduct inventory |
+| **Order Tracking** | `GET` | `http://localhost:5000/api/orders/:orderId` | Query order receipt & delivery stage |
+| **Recent Orders** | `GET` | [`http://localhost:5000/api/orders`](http://localhost:5000/api/orders) | Retrieve recent orders list |
+| **Customer Reviews**| `GET` | [`http://localhost:5000/api/reviews`](http://localhost:5000/api/reviews) | Verified customer testimonials |
+| **Post Review** | `POST` | `http://localhost:5000/api/reviews` | Submit new verified rating & review |
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Installation
